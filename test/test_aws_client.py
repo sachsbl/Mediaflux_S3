@@ -10,6 +10,9 @@ s3_client = S3Client(aws_access_key_id='',
 
 TEST_BUCKET = 'my-bucket'
 
+'''test setup here expects a bucket that you have PUT_OBJECT and GET_OBJECT credentials for.
+It needs a file at /test named testRaster.tif'''
+
 
 class TestListObjects:
     def test_valid_s3_location_no_prefix_returns_object_dict(self):
@@ -62,7 +65,7 @@ class TestUploadFile:
 
 class TestDownloadFile:
     test_dir = os.path.dirname(os.path.realpath(__file__)) + '/test_data'
-    test_file_key = 'testRaster.tif'
+    test_file_key = 'test/testRaster.tif'
 
     def test_valid_s3_location_valid_file_downloads_file(self):
         file_path = self.test_dir + '/download_{}'.format(uuid.uuid4())

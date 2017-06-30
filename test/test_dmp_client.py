@@ -5,12 +5,15 @@ import pytest
 
 from python_s3_client.s3_client import S3Client, S3ClientException
 
-s3_client = S3Client(aws_access_key_id='TaEyiSXv3mPOKj727E8dC7SgSGHLOaWwMPGcEr1r110321864',
-                     aws_secret_access_key='GO4gIeCoJgM9k5oHN110321865',
-                     endpoint='http://iu00facapp005.digitalglobe.com/s3/dg',
+s3_client = S3Client(aws_access_key_id='',
+                     aws_secret_access_key='',
+                     endpoint='http://mediaflux/s3',
                      mediaflux=True)
 
-TEST_BUCKET = 'Rt69pIHwODY9'
+TEST_BUCKET = 'my-bucket'
+
+'''test setup here expects a bucket that you have PUT_OBJECT and GET_OBJECT credentials for.
+It needs a file at /test named testRaster.tif'''
 
 
 class TestListObjects:
@@ -20,7 +23,7 @@ class TestListObjects:
         assert objects['KeyCount'] > 0
 
     def test_valid_s3_location_existing_prefix_returns_object_dict(self):
-        objects = s3_client.list_objects(TEST_BUCKET, 'bundles')
+        objects = s3_client.list_objects(TEST_BUCKET, 'TEST')
         assert type(objects) == dict
         assert objects['KeyCount'] > 0
 
@@ -32,17 +35,18 @@ class TestListObjects:
         with pytest.raises(S3ClientException) as context:
             _ = s3_client.list_objects('fake_bucket')
 
+        # depends on auth
         assert "Access Denied" in str(context.value) or "does not exist" in str(context.value)
 
 
 class TestUploadFile:
     test_file = os.path.dirname(os.path.realpath(__file__)) + '/test_data/testDEM.tif'
-    upload_location = 'bundles/Ben_Test_Bundle2'
+    upload_location = 'test'
 
     def test_valid_s3_location_valid_file_uploads_file(self):
         original_file_count = s3_client.list_objects(TEST_BUCKET, self.upload_location)['KeyCount']
 
-        s3_client.upload_file(self.test_file, TEST_BUCKET, '{}/{}.tif'.format(self.upload_location, uuid.uuid4()))
+        s3_client.upload_file(self.test_file, TEST_BUCKET, '{}/{}.txt'.format(self.upload_location, uuid.uuid4()))
 
         file_count = s3_client.list_objects(TEST_BUCKET, self.upload_location)['KeyCount']
 
@@ -50,12 +54,11 @@ class TestUploadFile:
 
     def test_invalid_s3_bucket_valid_file_raises(self):
         with pytest.raises(S3ClientException) as context:
-            s3_client.upload_file(self.test_file, 'fake_bucket',
-                                  '{}/{}.tif'.format(self.upload_location, uuid.uuid4()))
+            s3_client.upload_file(self.test_file, 'fake_bucket', '{}.tif'.format(uuid.uuid4()))
 
         assert "Failed to upload" in str(context.value)
 
-    def test_valid_s3_location_invalid_file_raises(self):
+    def test_valid_s3_bucket_invalid_file_raises(self):
         with pytest.raises(S3ClientException) as context:
             s3_client.upload_file('/fake/path.tif', TEST_BUCKET, '{}.tif'.format(uuid.uuid4()))
 
@@ -64,7 +67,7 @@ class TestUploadFile:
 
 class TestDownloadFile:
     test_dir = os.path.dirname(os.path.realpath(__file__)) + '/test_data'
-    test_file_key = '/bundles/Ben_Test_Bundle2/smallDem.tif'
+    test_file_key = 'test/testRaster.tif'
 
     def test_valid_s3_location_valid_file_downloads_file(self):
         file_path = self.test_dir + '/download_{}'.format(uuid.uuid4())
@@ -83,6 +86,7 @@ class TestDownloadFile:
         with pytest.raises(S3ClientException) as context:
             s3_client.download_file('fake_bucket', self.test_file_key, file_path)
 
+        # depends on auth
         assert 'Forbidden' in str(context.value) or 'Not Found' in str(context.value)
 
     def test_valid_s3_bucket_invalid_key_raises(self):
