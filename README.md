@@ -1,7 +1,9 @@
-# python-s3-client
+# mediaflux-s3-client
 
 The purpose of this library is to provide a common client for both AWS and Mediaflux flavors of S3.
-It uses monkey-patching to work around an issue with ContentLength headers. 
+http://www.arcitecta.com/Products/Mediaflux
+
+It uses monkey-patching to work around an issue with ContentLength headers containing commas in Mediaflux. 
 Other operations may work and can be accessed via interacting with the underlying boto3 client directly.  No guarantees.
 
 A full functional-test suite is included for the three wrapped operations (download_file, upload_file, list_objects).
