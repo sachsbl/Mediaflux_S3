@@ -19,7 +19,7 @@ class S3Client(object):
         if self.mediaflux:
             def _custom_handle_integer(shape, text):
                 # remove comma
-                text = text.split(',')[0]
+                text = text.replace(',', '.')
                 return int(text)
 
             def _new_parse_shape(self, shape, node):
