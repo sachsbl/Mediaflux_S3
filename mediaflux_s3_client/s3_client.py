@@ -18,7 +18,7 @@ class S3Client(object):
         # monkey patching of the header parsing to fix commas in ContentLength
         if self.mediaflux:
             def _custom_handle_integer(shape, text):
-                # remove comma
+                # replace comma
                 text = text.replace(',', '.')
                 return int(text)
 
