@@ -21,7 +21,7 @@ To statically vendor the client, use the wheel provided in the wheel folder.
 Basic Usage
 -----
 ```python
-from python_s3_client.s3_client import S3Client, S3ClientException
+from mediaflux_s3_client.s3_client import S3Client, S3ClientException
 
 # for AWS S3
 aws_s3_client = S3Client(aws_access_key_id='key', aws_secret_access_key='secret_key')

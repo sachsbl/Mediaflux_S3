@@ -3,7 +3,7 @@ import uuid
 
 import pytest
 
-from python_s3_client.s3_client import S3Client, S3ClientException
+from mediaflux_s3_client.s3_client import S3Client, S3ClientException
 
 s3_client = S3Client(aws_access_key_id='',
                      aws_secret_access_key='')
